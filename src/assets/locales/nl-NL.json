@@ -1,0 +1,10 @@
+{
+  "labels": {
+    "login": "Log in",
+    "logout": "Log out",
+    "signIn": "Inloggen",
+
+    "dashboard": "Hoofdscherm"
+  },
+  "metaData": {}
+}

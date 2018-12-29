@@ -1,0 +1,23 @@
+.page {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  &__sidebar {
+    display: grid;
+    min-width: 300px;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.2);
+    align-items: center;
+    &__logo {
+      max-width: 200px;
+    }
+  }
+  &__content {
+    display: grid;
+    background: white;
+  }
+  &__main {
+    &__section {
+      background: red;
+    }
+  }
+}

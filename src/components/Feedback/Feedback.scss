@@ -1,0 +1,9 @@
+.feedback {
+  &__error {
+    &__wrapper {
+      color: red;
+      font-weight: bold;
+      background: white;
+    }
+  }
+}

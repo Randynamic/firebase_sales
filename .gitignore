@@ -1,0 +1,8 @@
+node_modules/
+.vscode/
+!config/sample.env
+config/
+package-lock.json
+test/errorShots/
+test/reports/
+test/screenshots/

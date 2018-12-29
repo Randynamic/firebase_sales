@@ -1,0 +1,32 @@
+{
+  "labels": {
+    "login": "Login",
+    "logout": "Logout",
+    "signIn": "Sign In",
+
+    "dashboard": "Dashboard"
+  },
+  "metaData": {},
+  "datetime": {
+    "formats": {
+      "long": {
+        "standard": "YYYY-MM-DD HH:mm:ss",
+        "long": "MMMM Do YYYY HH:mm:ss",
+        "medium": "YYYY-MM-DD HH:mm",
+        "short": "YY-MM-DD HH:mm"
+      },
+      "time": {
+        "standard": "HH:mm:ss",
+        "long": "HH:mm:ss",
+        "medium": "HH:mm",
+        "short": "H:m"
+      },
+      "date": {
+        "standard": "YYYY-MM-DD",
+        "long": "MMMM Do YYYY",
+        "medium": "YYYY-MM-DD",
+        "short": "YY-MM-DD"
+      }
+    }
+  }
+}

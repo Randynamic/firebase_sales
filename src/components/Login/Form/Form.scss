@@ -1,0 +1,9 @@
+.form {
+  &__wrapper {
+    background: rgba(0, 0, 0, 0.2);
+    &__inputs {
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.2);
+    }
+  }
+}

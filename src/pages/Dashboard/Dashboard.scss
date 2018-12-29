@@ -1,0 +1,15 @@
+.dashboard {
+  &__wrapper {
+    &__container {
+      svg {
+        max-width: 1000px;
+        margin: 0 auto;
+        display: block;
+        rect,
+        path {
+          transition: all 1000ms cubic-bezier(0.6, -0.28, 0.735, 0.045);
+        }
+      }
+    }
+  }
+}
