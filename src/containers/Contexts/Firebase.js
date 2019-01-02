@@ -6,4 +6,4 @@ import React from "react";
 
 // import Firebase from "../Firebase";
 
-export const FirebaseContext = React.crateContext(null);
+export const FirebaseContext = React.createContext(null);
