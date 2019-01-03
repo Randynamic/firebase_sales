@@ -1,4 +1,29 @@
 import * as firebaseApp from "firebase/app";
+//
+import * as firebaseStorage from "firebase/storage";
+
+export const aggregation = (baseClass, ...mixins) => {
+  class base extends baseClass {
+    constructor(...args) {
+      super(...args);
+      mixins.forEach(mixin => {
+        copyProps(this, new mixin());
+      });
+    }
+  }
+  let copyProps = (target, source) => {
+    Object.getOwnPropertyNames(source)
+      .concat(Object.getOwnPropertySymbols(source))
+      .forEach(prop => {
+        if (!prop.match(/^(?:constructor|prototype|arguments|caller|name|bind|call|apply|toString|length)$/)) Object.defineProperty(target, prop, Object.getOwnPropertyDescriptor(source, prop));
+      });
+  };
+  mixins.forEach(mixin => {
+    copyProps(base.prototype, mixin.prototype);
+    copyProps(base, mixin);
+  });
+  return base;
+};
 
 class Firebase {
   config = {
@@ -12,8 +37,12 @@ class Firebase {
 
   constructor() {
     if (!firebaseApp.apps.length) {
-      firebaseApp.initializeApp(this.config);
+      this.app = firebaseApp;
+      this.app.initializeApp(this.config);
+    } else {
+      this.app = firebaseApp.apps[0];
     }
+    this.storage = this.app.storage();
   }
 }
 

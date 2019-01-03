@@ -1,3 +1,4 @@
+export const URL_ROOT = "/";
 export const URL_LOGIN = "/login";
 export const URL_LOGOUT = "/logout";
 export const URL_DASHBOARD = "/dashboard";

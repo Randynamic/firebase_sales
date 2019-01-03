@@ -6,7 +6,6 @@ const withFirebase = Component => props => {
   return (
     <FirebaseContext.Consumer>
       {firebase => {
-        console.log(".>.", firebase);
         return <Component {...props} firebase={firebase} />;
       }}
     </FirebaseContext.Consumer>

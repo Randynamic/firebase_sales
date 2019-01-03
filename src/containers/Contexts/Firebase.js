@@ -1,9 +1,13 @@
 import React from "react";
 
-// import { availableLanguages, defaultLocale } from "../../services/i18n/i18n";
+import Firebase from "../../containers/Firebase";
+import FirebaseStorage from "../../containers/Firebase/storage";
 
-// export { defaultLocale, getI18nData } from "../../services/i18n/i18n";
+import * as firebaseServices from "../../services/firebase/firebase";
 
-// import Firebase from "../Firebase";
+export { initConnection } from "../../services/firebase/firebase";
 
-export const FirebaseContext = React.createContext(null);
+export const FirebaseContext = React.createContext({
+  ...new Firebase(),
+  ...firebaseServices
+});

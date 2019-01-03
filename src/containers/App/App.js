@@ -11,7 +11,6 @@ import Routes from "../../routes/Routes";
 import { checkSession, authenticateSession } from "../../services/auth/auth";
 
 import withFirebase from "../../hoc/Firebase";
-import Firebase from "../../containers/Firebase";
 import { FirebaseContext } from "../Contexts/Firebase";
 import { I18nContext, defaultLocale, getI18nData } from "../Contexts/I18n";
 import { SessionContext } from "../Contexts/Session";
@@ -22,7 +21,8 @@ const AppRoutes = props => {
 
 class AppComponent extends React.Component {
   state = {
-    i18n: {}
+    i18n: {},
+    firebase: undefined
   };
 
   initLanguage = async (locale = defaultLocale) => {
@@ -34,13 +34,21 @@ class AppComponent extends React.Component {
     if (!this.state.languageData) {
       this.initLanguage();
     }
+    if (!this.state.firebase) {
+      this.setState(prevState => {
+        return {
+          ...prevState,
+          firebase: { ...this.props.firebase }
+        };
+      });
+    }
   }
 
   render() {
     return (
       <I18nContext.Provider value={{ i18n: { ...this.state.i18n, changeLanguage: this.initLanguage } }}>
         <SessionContext.Provider value={{ session: { currentUser: this.props.currentUser } }}>
-          <FirebaseContext.Provider value={new Firebase()}>
+          <FirebaseContext.Provider value={{ firebase: this.state.firebase }}>
             <AppRoutes {...this.props} />
           </FirebaseContext.Provider>
         </SessionContext.Provider>

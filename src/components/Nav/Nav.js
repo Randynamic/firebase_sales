@@ -1,13 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { URL_LOGIN, URL_LOGOUT, URL_DASHBOARD, URL_ABOUT_US, URL_MY_ACCOUNT } from "../../store/constants";
+import { URL_ROOT, URL_LOGIN, URL_LOGOUT, URL_DASHBOARD, URL_ABOUT_US, URL_MY_ACCOUNT } from "../../store/constants";
 import LanguageSelectors from "../Buttons/LanguageSelectors";
 
 export const Nav = ({ i18n, ...props }) => {
   const { _, activeLanguage } = i18n;
   return (
     <nav>
-      <div>Nav Component Locale [{activeLanguage}]</div>
+      <Link to={URL_ROOT}>{_("root")}</Link>
+      {` [${activeLanguage}] | `}
       <Link to={URL_LOGIN}>{_("login")}</Link>
       {" | "}
       <Link to={URL_DASHBOARD}>{_("dashboard")}</Link>
