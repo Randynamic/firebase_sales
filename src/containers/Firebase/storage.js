@@ -8,6 +8,7 @@ export default class extends aggregation(Firebase) {
   constructor() {
     super();
     this.storage = this.app.storage();
+    console.log(">>>", this.storage);
   }
 
   listFiles() {
