@@ -43,14 +43,9 @@ api_routes.get(
         id: metadata.id,
         type: getType(metadata.contentType),
         size: metadata.size,
-        metadata: {
-          bucket: metadata.bucket,
-          dates: {
-            updated: metadata.updated,
-            createdAt: metadata.timeCreated
-          }
-        },
-        name
+        metadata: metadata.metadata,
+        name,
+        displayName: name.replace(prefix + "/", "")
       });
     });
     return res.json({
@@ -87,7 +82,7 @@ api_routes.post(
   upload.fields([
     {
       name: "imageFile",
-      maxCount: 3
+      maxCount: 10
     }
   ]),
   utils.wrap(async (req, res) => {
@@ -120,7 +115,7 @@ api_routes.post(
 
     uploadedFiles.map((uploadedFile, index) => {
       const file = bucket.file(`${path}/${uploadedFile.originalname}`);
-      const content = uploadedFile.buffer.toString("utf-8");
+      const content = uploadedFile.buffer;
       file
         .save(content)
         .then(async err => {
@@ -163,7 +158,7 @@ api_routes.delete(
 
     if (file) {
       return file.delete().then(data => {
-        res.status(410).json({ ...data[0] });
+        res.status(200).json({ ...data[0] });
       });
     }
     res.status(404).json({ fileName, file });

@@ -6,3 +6,4 @@ package-lock.json
 test/errorShots/
 test/reports/
 test/screenshots/
+tmp
