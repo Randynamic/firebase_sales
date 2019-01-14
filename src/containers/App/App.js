@@ -22,7 +22,8 @@ const AppRoutes = props => {
 class AppComponent extends React.Component {
   state = {
     i18n: {},
-    firebase: undefined
+    firebase: undefined,
+    session: {}
   };
 
   initLanguage = async (locale = defaultLocale) => {
@@ -47,7 +48,7 @@ class AppComponent extends React.Component {
   render() {
     return (
       <I18nContext.Provider value={{ i18n: { ...this.state.i18n, changeLanguage: this.initLanguage } }}>
-        <SessionContext.Provider value={{ session: { currentUser: this.props.currentUser } }}>
+        <SessionContext.Provider value={{ session: { currentUser: this.props.currentUser, isAuthenticated: this.props.isAuthenticated } }}>
           <FirebaseContext.Provider value={{ firebase: this.state.firebase }}>
             <AppRoutes {...this.props} />
           </FirebaseContext.Provider>

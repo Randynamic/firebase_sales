@@ -9,12 +9,16 @@ export const PublicConsumer = props => {
   return (
     <I18nContext.Consumer>
       {i18n => (
-        <FirebaseContext.Consumer>
-          {firebase => (
-            // Wrapping component with Context Consumers
-            <ConsumingComponent {...rest} {...i18n} {...firebase} />
+        <SessionContext.Consumer>
+          {session => (
+            <FirebaseContext.Consumer>
+              {firebase => (
+                // Wrapping component with Context Consumers
+                <ConsumingComponent {...rest} {...i18n} {...firebase} {...session} />
+              )}
+            </FirebaseContext.Consumer>
           )}
-        </FirebaseContext.Consumer>
+        </SessionContext.Consumer>
       )}
     </I18nContext.Consumer>
   );

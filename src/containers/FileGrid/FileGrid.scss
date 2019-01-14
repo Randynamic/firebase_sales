@@ -1,0 +1,30 @@
+.wrapper {
+  display: block;
+  margin: 20px;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.box {
+  display: block;
+  margin: 20px;
+  padding: 0;
+  float: left;
+  width: 200px;
+  height: auto;
+
+  strong {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    display: block;
+  }
+}
+
+.form {
+  display: block;
+  overflow: hidden;
+  margin: 20px;
+  padding: 20px;
+  border-top: 1px solid black;
+}

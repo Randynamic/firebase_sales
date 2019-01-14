@@ -27,6 +27,13 @@ export const getSession = async session => {
   }
   return null;
 };
+export const getSessionSync = session => {
+  let authSession = session || Cookies.getJSON(process.env.COOKIE_SESSION);
+  if (authSession) {
+    return authSession;
+  }
+  return null;
+};
 
 /**
  * @description Promise to check if session is valid else remove session and return null
