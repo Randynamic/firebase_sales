@@ -57,6 +57,7 @@ export class FileGrid extends React.Component {
   mounted = false;
   uploadData = undefined;
   previewFiles = [];
+  refreshToken = "";
 
   constructor(props) {
     super(props);
@@ -74,7 +75,14 @@ export class FileGrid extends React.Component {
     this.mounted = false;
   }
 
+  getToken() {
+    return Math.random().toString(36);
+  }
+
   getFiles = files => {
+    if (files.length > 0) {
+      this.setState({ loading: true });
+    }
     this.mounted &&
       files.map((file, index) => {
         this.storageRef
@@ -138,7 +146,7 @@ export class FileGrid extends React.Component {
     let previewFiles = [...this.state.previewFiles];
     previewFiles = previewFiles.filter(item => item.name !== file.name);
     this.setState(prevState => {
-      return { ...prevState, previewFiles };
+      return { ...prevState, previewFiles, refreshToken: this.getToken() };
     });
   };
 
@@ -158,7 +166,7 @@ export class FileGrid extends React.Component {
 
   resetForm() {
     this.setState(prevState => {
-      return { ...prevState, previewFiles: [] };
+      return { ...prevState, previewFiles: [], refreshToken: this.getToken() };
     });
   }
 
@@ -188,7 +196,7 @@ export class FileGrid extends React.Component {
         axios
           .post(uploadUrl, formData, config)
           .then(result => {
-            this.resetForm(result.data.responses);
+            this.resetForm();
             this.getFiles(result.data.responses);
           })
           .catch(e => console.log("error", e));
@@ -234,7 +242,7 @@ export class FileGrid extends React.Component {
             <hr />
             {this.state.previewFiles && this.state.previewFiles.length > 0 && <PreviewFiles files={this.state.previewFiles} removeHandler={this.removePreviewFile} />}
             <form className={styles.form} action={this.baseUrl + "/upload"} ref={ref => (this.formRef = ref)} method="post" encType="multipart/form-data" onSubmit={this.handleSubmit}>
-              <input type="file" name="imageFile" multiple={true} ref={ref => (this.filesToUpload = ref)} onChange={this.previewFilesHandler} />
+              <input type="file" name="imageFile" multiple={true} key={this.state.refreshToken || ""} ref={ref => (this.filesToUpload = this.filesInputRef = ref)} onChange={this.previewFilesHandler} />
               <input type="hidden" name="path" value={this.baseDir} />
               <input type="hidden" name="imageMeta1" value="metaValue1" />
               <input type="hidden" name="imageMeta2" value="metaValue2" />
