@@ -15,20 +15,22 @@ const Media = props => {
     <div className={styles.box}>
       <img src={data.url} width={200} height={200} />
       <strong>{data.displayName}</strong>
-      <div>{new Date().getTime()}</div>
+      <div>{data.uid}</div>
       <div>{data.size}</div>
-      <div>imageMeta1: {data.metadata.imageMeta1}</div>
-      <div>imageMeta2: {data.metadata.imageMeta2}</div>
-      <div>imageMeta3: {data.metadata.imageMeta3}</div>
-      <div>owner: {data.metadata.owner}</div>
+      {data.metadata &&
+        Object.keys(data.metadata).map((value, key) => (
+          <div key={key}>
+            {value}: {data.metadata[value]}
+          </div>
+        ))}
       {props.isAuthenticated && <button onClick={() => props.removeHandler(data)}>-Delete-</button>}
     </div>
   );
 };
 
 const PreviewFiles = props => {
+  console.log(props.metaData);
   return (
-    //
     <div className={styles.previewsWrapper}>
       Preview Files ({props.files.length})
       {props.files.map((file, index) => {
@@ -36,8 +38,17 @@ const PreviewFiles = props => {
           <div key={file.name}>
             <img src={file.data} className={styles.previewImages} />
             <strong>{file.name}</strong>
-            <div>{new Date().getTime()}</div>
+            <div>{file.uid}</div>
             <div>{file.size}</div>
+            {props.metaData &&
+              props.metaData[file.uid] &&
+              Object.keys(props.metaData[file.uid]).map((value, key) => (
+                <div key={key}>
+                  {value}: {props.metaData[file.uid][value]}
+                </div>
+              ))}
+            <input type="text" data-uid={file.uid} data-meta-key={"meta1"} placeholder="metadata 1" onChange={props.handleMetadata.bind(this)()} />
+            <input type="text" data-uid={file.uid} data-meta-key={"meta2"} placeholder="metadata 2" onChange={props.handleMetadata.bind(this)()} />
             <button onClick={() => props.removeHandler(file)}>-Delete-</button>
           </div>
         );
@@ -58,6 +69,7 @@ export class FileGrid extends React.Component {
   uploadData = undefined;
   previewFiles = [];
   refreshToken = "";
+  filesMetaData = {};
 
   constructor(props) {
     super(props);
@@ -76,7 +88,10 @@ export class FileGrid extends React.Component {
   }
 
   getToken() {
-    return Math.random().toString(36);
+    return Math.random(10)
+      .toString(36)
+      .split(".")
+      .pop();
   }
 
   getFiles = files => {
@@ -94,10 +109,11 @@ export class FileGrid extends React.Component {
               const fileExists = newFilesList.find(listFile => file.name === listFile.name);
               if (fileExists) {
                 newFilesList.map(listedFile => {
+                  listedFile.uid = this.getToken();
                   return listedFile.name === file.name ? { ...file, url } : listedFile;
                 });
               } else {
-                newFilesList.push({ ...file, url });
+                newFilesList.push({ ...file, url, uid: this.getToken() });
               }
               return { ...prevState, files: newFilesList };
             });
@@ -187,12 +203,10 @@ export class FileGrid extends React.Component {
     const formData = new FormData();
     this.state.previewFiles.map((fileData, index) => {
       this.setState({ loading: true });
-      formData.append("imageFile", fileData.file);
+      formData.append(fileData.uid, fileData.file);
       if (this.state.previewFiles.length - 1 === index) {
         formData.append("path", this.baseDir);
-        formData.append("imageMeta1", "metaValue1");
-        formData.append("imageMeta2", "metaValue2");
-        formData.append("imageMeta3", "metaValue3");
+        formData.append("imageMetaData", JSON.stringify(this.state.filesMetaData));
         axios
           .post(uploadUrl, formData, config)
           .then(result => {
@@ -204,6 +218,39 @@ export class FileGrid extends React.Component {
     });
   }
 
+  handleMetadata(e) {
+    e.persist();
+    const dataset = e.currentTarget.dataset;
+    const metaData = { [dataset.metaKey]: e.currentTarget.value };
+    this.setState(prevState => {
+      let newState = {};
+      if (prevState.filesMetaData && prevState.filesMetaData[dataset.uid]) {
+        newState = {
+          ...prevState,
+          filesMetaData: {
+            ...prevState.filesMetaData,
+            [dataset.uid]: {
+              ...prevState.filesMetaData[dataset.uid],
+              ...metaData
+            }
+          }
+        };
+      } else {
+        newState = {
+          ...prevState,
+          filesMetaData: {
+            ...prevState.filesMetaData,
+            [dataset.uid]: {
+              ...metaData
+            }
+          }
+        };
+      }
+      console.log(newState);
+      return newState;
+    });
+  }
+
   previewFilesHandler() {
     this.previewFiles = Array.from(this.filesToUpload.files);
     this.previewFiles.map((file, fileIndex) => {
@@ -212,7 +259,7 @@ export class FileGrid extends React.Component {
       reader.onload = e => {
         const previewFiles = this.state.previewFiles ? [...this.state.previewFiles] : [];
         if (!previewFiles.find(file => fileToAppend.name === file.name)) {
-          previewFiles.push({ name: fileToAppend.name, data: e.target.result, file });
+          previewFiles.push({ name: fileToAppend.name, data: e.target.result, file, uid: this.getToken() });
         }
         this.setState(prevState => {
           return { ...prevState, previewFiles };
@@ -240,13 +287,10 @@ export class FileGrid extends React.Component {
           <>
             {this.state.previewFiles && this.state.previewFiles.length > 0 && (this.state.uploadProgress || this.state.uploadProgress > 0) && `${this.state.uploadProgress}%`}
             <hr />
-            {this.state.previewFiles && this.state.previewFiles.length > 0 && <PreviewFiles files={this.state.previewFiles} removeHandler={this.removePreviewFile} />}
+            {this.state.previewFiles && this.state.previewFiles.length > 0 && <PreviewFiles files={this.state.previewFiles} removeHandler={this.removePreviewFile} metaData={this.state.filesMetaData} handleMetadata={() => this.handleMetadata.bind(this)} />}
             <form className={styles.form} action={this.baseUrl + "/upload"} ref={ref => (this.formRef = ref)} method="post" encType="multipart/form-data" onSubmit={this.handleSubmit}>
               <input type="file" name="imageFile" multiple={true} key={this.state.refreshToken || ""} ref={ref => (this.filesToUpload = this.filesInputRef = ref)} onChange={this.previewFilesHandler} />
               <input type="hidden" name="path" value={this.baseDir} />
-              <input type="hidden" name="imageMeta1" value="metaValue1" />
-              <input type="hidden" name="imageMeta2" value="metaValue2" />
-              <input type="hidden" name="imageMeta3" value="metaValue3" />
               <input type="submit" value="Upload" />
             </form>
           </>

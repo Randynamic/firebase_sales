@@ -95,23 +95,19 @@ api_routes.get(
 
 api_routes.post(
   "/upload",
-  upload.fields([
-    {
-      name: "imageFile",
-      maxCount: 10
-    }
-  ]),
+  upload.any(),
   utils.wrap(async (req, res) => {
     const bucketName = process.env.DEFAULT_BUCKET;
     const bucket = storage.bucket(bucketName);
-    let metaData = { ...req.body };
-    const uploadedFiles = req.files.imageFile;
+    let payload = req.body;
+    const metaData = JSON.parse(payload.imageMetaData);
+    const uploadedFiles = req.files;
     let errors = [];
     let apiResponses = [];
     let path = req.body.path;
     const lastCharPath = path.split("").pop();
     let currentPosition = 0;
-    const finalizeRequest = (files, errors, responses, res) => {
+    const finalizeRequest = (errors, responses, res) => {
       if (currentPosition === uploadedFiles.length - 1) {
         if (errors.length > 0) {
           return res.status(500).json({ errors });
@@ -132,7 +128,7 @@ api_routes.post(
       return res.status(404).json({ error: "no files" });
     }
 
-    uploadedFiles.map(({ buffer, ...uploadedFile }, index) => {
+    uploadedFiles.map(({ buffer, fieldname, ...uploadedFile }, index) => {
       const file = bucket.file(`${path}/${uploadedFile.originalname}`);
       file
         .save(buffer)
@@ -142,8 +138,8 @@ api_routes.post(
             .setMetadata({
               contentType: uploadedFile.mimetype,
               metadata: {
-                ...metaData,
-                owner: "USER_UID"
+                ...metaData[fieldname],
+                owner: fieldname
               }
             })
             .then((responses, metaDataError) => {
@@ -156,16 +152,16 @@ api_routes.post(
                 ...response
               };
               apiResponses.push(responseFile);
-              return finalizeRequest(uploadedFiles, errors, apiResponses, res);
+              return finalizeRequest(errors, apiResponses, res);
             })
             .catch(metaDataError => {
               errors.push({ file: index, type: "metaDataError", ...metaDataError });
-              finalizeRequest(uploadedFiles, errors, apiResponses, res);
+              finalizeRequest(errors, apiResponses, res);
             });
         })
         .catch(saveError => {
           errors.push({ file: index, type: "saveError", ...saveError });
-          finalizeRequest(uploadedFiles, errors, apiResponses, res);
+          finalizeRequest(errors, apiResponses, res);
         });
     });
   })
