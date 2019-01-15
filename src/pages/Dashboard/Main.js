@@ -2,6 +2,8 @@ import React from "react";
 import Page from "../../containers/Page/Page";
 import { Nav } from "../../components/Nav/Nav";
 
+import FileGrid from "../../containers/FileGrid/FileGrid";
+
 import styles from "./Dashboard.scss";
 
 export default class extends React.Component {
@@ -15,6 +17,7 @@ export default class extends React.Component {
         <main className={styles.dashboard__wrapper}>
           <Nav {...this.props} />
           <section className={styles.dashboard__wrapper__container}>Dashboard</section>
+          <FileGrid {...this.props} />
         </main>
       </Page>
     );

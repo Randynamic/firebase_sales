@@ -4,7 +4,7 @@ import { Switch, Redirect } from "react-router-dom";
 /**
  * Loadeable Components
  */
-import { Homepage, AboutUs, Login, Logout, Dashboard, MyAccount } from "./PageComponents";
+import { Homepage, Login, Logout, Dashboard } from "./PageComponents";
 import { NotFound } from "../pages/Common/NotFound";
 
 /**
@@ -28,11 +28,9 @@ export const Reject = ({ to }) => {
 export const RouterComponent = props => (
   <Switch>
     <ContextRoute exact path="/" component={Homepage} />
-    <ContextRoute exact path="/about-us" component={AboutUs} />
     <UnauthenticatedRoute exact path="/login" component={Login} />
     <UnauthenticatedRoute exact path="/logout" component={Logout} />
     <AuthenticatedRoute exact path="/dashboard" component={Dashboard} />
-    <AuthenticatedRoute exact path="/my-account" component={MyAccount} />
     <ContextRoute component={NotFound} />
   </Switch>
 );

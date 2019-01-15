@@ -1,5 +1,5 @@
 import Firebase, { aggregation } from ".";
-import * as firebaseStorage from "firebase/storage";
+// import * as firebaseStorage from "firebase/storage";
 
 /**
  * @description Using an expression as extention to be able to extend from multiple classes

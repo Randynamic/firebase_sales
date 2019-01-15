@@ -15,6 +15,33 @@ const getType = type => {
   return type === "application/x-www-form-urlencoded;charset=UTF-8" ? "directory" : type;
 };
 
+const transformFilesResponse = (isListing, files, prefix) => {
+  const filesToResponse = [];
+  files.map(file => {
+    if (isListing) {
+      const { metadata, name } = file;
+      filesToResponse.push({
+        id: metadata.id,
+        type: getType(metadata.contentType),
+        size: metadata.size,
+        metadata: metadata.metadata,
+        name,
+        displayName: prefix ? name.replace(prefix + "/", "") : file.originalname
+      });
+    } else {
+      filesToResponse.push({
+        id: file.id,
+        type: getType(file.contentType),
+        size: file.size,
+        metadata: file.metadata,
+        name: file.name,
+        displayName: file.originalname
+      });
+    }
+  });
+  return filesToResponse;
+};
+
 const unlinkFile = path => {
   setTimeout(() => fs.unlinkSync(path), 10000);
 };
@@ -36,18 +63,7 @@ api_routes.get(
     const prefix = req.params.prefix || "";
     const bucket = storage.bucket(bucketName);
     const [files] = await bucket.getFiles({ prefix });
-    const filesToResponse = [];
-    files.forEach(file => {
-      const { metadata, name } = file;
-      filesToResponse.push({
-        id: metadata.id,
-        type: getType(metadata.contentType),
-        size: metadata.size,
-        metadata: metadata.metadata,
-        name,
-        displayName: name.replace(prefix + "/", "")
-      });
-    });
+    const filesToResponse = transformFilesResponse(true, files, prefix);
     return res.json({
       ok: true,
       data: { objects: filesToResponse }
@@ -100,7 +116,10 @@ api_routes.post(
         if (errors.length > 0) {
           return res.status(500).json({ errors });
         }
-        return res.json({ responses, errors });
+        return res.json({
+          responses: transformFilesResponse(false, responses),
+          errors
+        });
       }
       currentPosition++;
     };
@@ -113,11 +132,10 @@ api_routes.post(
       return res.status(404).json({ error: "no files" });
     }
 
-    uploadedFiles.map((uploadedFile, index) => {
+    uploadedFiles.map(({ buffer, ...uploadedFile }, index) => {
       const file = bucket.file(`${path}/${uploadedFile.originalname}`);
-      const content = uploadedFile.buffer;
       file
-        .save(content)
+        .save(buffer)
         .then(async err => {
           if (err.length > 0) return res.json(err);
           await file
@@ -128,11 +146,16 @@ api_routes.post(
                 owner: "USER_UID"
               }
             })
-            .then((response, metaDataError) => {
-              if (metaDataError && response.length === 0) {
+            .then((responses, metaDataError) => {
+              const { buffer, ...response } = responses[0];
+              if (metaDataError && responses.length === 0) {
                 return errors.push({ file: index, type: "metaDataError", ...metaDataError });
               }
-              apiResponses.push(response[0]);
+              const responseFile = {
+                ...uploadedFile,
+                ...response
+              };
+              apiResponses.push(responseFile);
               return finalizeRequest(uploadedFiles, errors, apiResponses, res);
             })
             .catch(metaDataError => {

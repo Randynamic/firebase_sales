@@ -1,3 +1,13 @@
+.loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.5);
+}
+
 .wrapper {
   display: block;
   margin: 20px;
@@ -11,7 +21,9 @@
   padding: 0;
   float: left;
   width: 200px;
-  height: auto;
+  height: 350px;
+  border: 1px solid black;
+  padding: 20px;
 
   strong {
     text-overflow: ellipsis;
@@ -27,4 +39,30 @@
   margin: 20px;
   padding: 20px;
   border-top: 1px solid black;
+}
+
+.previewsWrapper {
+  @extend .wrapper;
+
+  > div {
+    border: 1px solid red;
+    display: block;
+    margin: 0 20px 0 0;
+    float: left;
+    width: 280px;
+
+    > img {
+    }
+
+    button {
+      display: block;
+      width: 100%;
+    }
+  }
+}
+
+.previewImages {
+  @extend .box;
+  height: auto;
+  max-height: 200px;
 }
