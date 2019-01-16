@@ -22,7 +22,6 @@ export const filesGrid = function() {
         ) : (
           <NoMediaFiles i18n={this.props.i18n} />
         )}
-        ;
       </div>
     </>
   );

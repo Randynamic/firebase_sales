@@ -1,5 +1,7 @@
 import React from "react";
 
+import styles from "./FileGrid.scss";
+
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 
@@ -55,7 +57,7 @@ export class FileGrid extends React.Component {
 
   render() {
     return (
-      <div className={"wrapper"}>
+      <div>
         <Loading {...this.props} loading={this.state.loading} />
         {this.filesGrid()}
         {this.props.isAuthenticated && this.uploaderComponent()}
