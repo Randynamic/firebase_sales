@@ -8,7 +8,9 @@
 
     "meta1": "Meta 1 EN",
     "meta2": "Meta 2 EN",
-    "owner": "Owner"
+    "owner": "Owner",
+
+    "sure_to_remove_file": "Are you sure you want to remove this file?"
   },
   "metaData": {},
   "datetime": {

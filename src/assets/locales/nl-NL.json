@@ -7,7 +7,8 @@
     "dashboard": "Hoofdscherm",
     "meta1": "Meta 1 NL",
     "meta2": "Meta 2 NL",
-    "owner": "Eigenaar"
+    "owner": "Eigenaar",
+    "sure_to_remove_file": "Weet u zeker dat u dit bestand wil verwijderen?"
   },
   "metaData": {}
 }

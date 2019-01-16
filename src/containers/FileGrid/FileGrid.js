@@ -5,6 +5,8 @@ import axios from "axios";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 
+import { byteSize } from "../../utils/utils";
+
 import { checkSession, authenticateSession } from "../../services/auth/auth";
 
 import styles from "./FileGrid.scss";
@@ -14,15 +16,14 @@ const Media = props => {
   return (
     <div className={styles.box}>
       <a href={data.url} target="_blank">
-        <img src={data.url} width={200} height={200} />
+        <img key={data.uid} src={data.url} width={200} height={200} />
       </a>
       <strong>{data.displayName}</strong>
-      <div>{data.uid}</div>
-      <div>{data.size}</div>
+      <div className={styles.fileSizeLabel}>{byteSize(data.size)}</div>
       {data.metadata &&
         Object.keys(data.metadata).map((value, key) => (
-          <div key={key}>
-            {props.i18n._(value)}: {data.metadata[value]}
+          <div key={key} className={styles.metaData}>
+            <b>{props.i18n._(value)}</b>: {data.metadata[value]}
           </div>
         ))}
       {props.isAuthenticated && (
@@ -42,16 +43,15 @@ const PreviewFiles = props => {
         const fileExists = props.listedFiles.find(item => item.displayName === file.name);
         const initMetaData = (fileExists && fileExists.metadata) || {};
         return (
-          <div key={file.name}>
-            <img src={file.data} className={styles.previewImages} />
+          <div key={file.name} className={styles.thumbWrapper}>
+            <img key={file.uid} src={file.data} className={styles.previewImages} />
             <strong>{file.name}</strong>
-            <div>{file.uid}</div>
-            <div>{file.size}</div>
+            <div className={styles.fileSizeLabel}>{byteSize(file.size)}</div>
             {props.metaData &&
               props.metaData[file.uid] &&
               Object.keys(props.metaData[file.uid]).map((value, key) => (
-                <div key={key}>
-                  {props.i18n._(value)}: {props.metaData[file.uid][value]}
+                <div key={key} className={styles.metaData}>
+                  <b>{props.i18n._(value)}</b>: {props.metaData[file.uid][value]}
                 </div>
               ))}
             <input type="text" data-uid={file.uid} data-meta-key={"meta1"} data-init-value={initMetaData["meta1"]} placeholder={initMetaData["meta1"] || "meta 1"} onChange={props.handleMetadata.bind(this)()} onClick={props.handleInitMetadata.bind(this)()} onBlur={props.handleInitMetadata.bind(this)()} />
@@ -154,6 +154,9 @@ export class FileGrid extends React.Component {
   };
 
   removeFile = file => {
+    if (!window.confirm(this.props.i18n._("sure_to_remove_file"))) {
+      return false;
+    }
     const fileName = encodeURIComponent(file.name);
     const index = this.state.files.findIndex(_file => _file.name === file.name);
     const newFilesList = [...this.state.files];
