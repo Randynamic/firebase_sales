@@ -4,7 +4,11 @@
     "logout": "Logout",
     "signIn": "Sign In",
 
-    "dashboard": "Dashboard"
+    "dashboard": "Dashboard",
+
+    "meta1": "Meta 1 EN",
+    "meta2": "Meta 2 EN",
+    "owner": "Owner"
   },
   "metaData": {},
   "datetime": {

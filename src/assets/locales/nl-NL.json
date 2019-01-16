@@ -4,7 +4,10 @@
     "logout": "Log out",
     "signIn": "Inloggen",
 
-    "dashboard": "Hoofdscherm"
+    "dashboard": "Hoofdscherm",
+    "meta1": "Meta 1 NL",
+    "meta2": "Meta 2 NL",
+    "owner": "Eigenaar"
   },
   "metaData": {}
 }
