@@ -8,13 +8,6 @@
   background: rgba(0, 0, 0, 0.5);
 }
 
-.wrapper {
-  display: block;
-  margin: 20px;
-  padding: 20px;
-  overflow: hidden;
-}
-
 .box {
   position: relative;
   display: block;
@@ -25,12 +18,118 @@
   height: 350px;
   border: 1px solid black;
   padding: 20px;
+}
 
-  strong {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    display: block;
+.header {
+  display: block;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  clear: both;
+  float: none;
+  height: 50px;
+  font-size: 30px;
+  font-weight: 600;
+}
+
+.wrapper {
+  display: block;
+  margin: 20px;
+  overflow: hidden;
+
+  .header {
+    @extend .header;
+  }
+
+  .box {
+    @extend .box;
+
+    strong {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      display: block;
+    }
+
+    .previewImages {
+      height: auto;
+      max-height: 200px;
+    }
+
+    .deleteBtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 30px;
+      height: 30px;
+      background: red;
+      border: 2px solid darkred;
+      line-height: 0;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .metaData {
+      font-size: 12px;
+      color: grey;
+    }
+
+    .fileSizeLabel {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: auto;
+      height: 20px;
+      line-height: 20px;
+      padding: 5px;
+      font-size: 12px;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+    }
+  }
+}
+
+.previewsWrapper {
+  @extend .wrapper;
+  padding: 0;
+
+  .header {
+    @extend .header;
+  }
+
+  .thumbWrapper {
+    @extend .box;
+
+    img {
+    }
+
+    &[data-file-exists="true"] {
+      background: rgba(255, 170, 0, 0.19);
+    }
+    &:not([data-file-exists="true"]) {
+      border: 1px solid blue;
+    }
+
+    input {
+      width: calc(100% - 24px);
+      padding: 10px;
+      font-size: 14px;
+    }
+  }
+
+  .dataTransferArea {
+    background: rgba(255, 170, 0, 0.2);
+    border: 5px dashed rgb(255, 170, 0);
+    height: 200px;
+    width: calc(100% - (10px));
+    display: flex;
+
+    span {
+      margin: auto;
+      color: rgba(0, 0, 0, 0.25);
+      font-size: 30px;
+    }
   }
 }
 
@@ -40,72 +139,4 @@
   margin: 20px;
   padding: 20px;
   border-top: 1px solid black;
-}
-
-.previewsWrapper {
-  @extend .wrapper;
-
-  > div {
-    position: relative;
-    border: 1px solid red;
-    display: block;
-    margin: 0 20px 0 0;
-    float: left;
-    width: 280px;
-
-    > img {
-    }
-
-    input {
-      // display: block;
-      width: calc(100% - 24px);
-      padding: 10px;
-      font-size: 14px;
-    }
-  }
-}
-
-.previewImages {
-  @extend .box;
-  height: auto;
-  max-height: 200px;
-}
-
-.thumbWrapper {
-  @extend .box;
-
-  img {
-  }
-}
-
-.deleteBtn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 30px;
-  height: 30px;
-  background: red;
-  border: 2px solid darkred;
-  line-height: 0;
-  color: white;
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.metaData {
-  font-size: 12px;
-  color: grey;
-}
-
-.fileSizeLabel {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  width: auto;
-  height: 20px;
-  line-height: 20px;
-  padding: 5px;
-  font-size: 12px;
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
 }

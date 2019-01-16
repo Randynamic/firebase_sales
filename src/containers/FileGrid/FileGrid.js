@@ -11,6 +11,18 @@ import { checkSession, authenticateSession } from "../../services/auth/auth";
 
 import styles from "./FileGrid.scss";
 
+const Loading = props => {
+  return <div className={styles.loading}>Loading</div>;
+};
+
+const DataTransferArea = props => {
+  return (
+    <div className={styles.dataTransferArea}>
+      <span>Upload files</span>
+    </div>
+  );
+};
+
 const Media = props => {
   const { data } = props;
   return (
@@ -38,30 +50,40 @@ const Media = props => {
 const PreviewFiles = props => {
   return (
     <div className={styles.previewsWrapper}>
-      Preview Files ({props.files.length})
-      {props.files.map((file, index) => {
-        const fileExists = props.listedFiles.find(item => item.displayName === file.name);
-        const initMetaData = (fileExists && fileExists.metadata) || {};
-        return (
-          <div key={file.name} className={styles.thumbWrapper}>
-            <img key={file.uid} src={file.data} className={styles.previewImages} />
-            <strong>{file.name}</strong>
-            <div className={styles.fileSizeLabel}>{byteSize(file.size)}</div>
-            {props.metaData &&
-              props.metaData[file.uid] &&
-              Object.keys(props.metaData[file.uid]).map((value, key) => (
-                <div key={key} className={styles.metaData}>
-                  <b>{props.i18n._(value)}</b>: {props.metaData[file.uid][value]}
-                </div>
-              ))}
-            <input type="text" data-uid={file.uid} data-meta-key={"meta1"} data-init-value={initMetaData["meta1"]} placeholder={initMetaData["meta1"] || "meta 1"} onChange={props.handleMetadata.bind(this)()} onClick={props.handleInitMetadata.bind(this)()} onBlur={props.handleInitMetadata.bind(this)()} />
-            <input type="text" data-uid={file.uid} data-meta-key={"meta2"} data-init-value={initMetaData["meta2"]} placeholder={initMetaData["meta2"] || "meta 2"} onChange={props.handleMetadata.bind(this)()} onClick={props.handleInitMetadata.bind(this)()} onBlur={props.handleInitMetadata.bind(this)()} />
-            <button className={styles.deleteBtn} onClick={() => props.removeHandler(file)}>
-              x
-            </button>
+      {props.files && props.files.length > 0 ? (
+        <>
+          <div className={styles.header}>
+            {props.i18n._("files_to_upload")} ({props.files.length})
           </div>
-        );
-      })}
+          {props.files.map((fileItem, index) => {
+            const { file } = fileItem;
+            const fileExists = props.listedFiles.find(item => item.displayName === fileItem.name);
+            const initMetaData = (fileExists && fileExists.metadata) || {};
+            return (
+              <div key={fileItem.name} className={styles.thumbWrapper} data-file-exists={fileExists ? true : false}>
+                <img key={fileItem.uid} src={fileItem.data} className={styles.previewImages} />
+                <strong>{file.name}</strong>
+                <div className={styles.fileSizeLabel}>{byteSize(file.size)}</div>
+                {props.metaData &&
+                  props.metaData[fileItem.uid] &&
+                  Object.keys(props.metaData[fileItem.uid]).map((value, key) => (
+                    <div key={key} className={styles.metaData}>
+                      <b>{props.i18n._(value)}</b>: {props.metaData[fileItem.uid][value]}
+                    </div>
+                  ))}
+                <input type="text" data-uid={fileItem.uid} data-meta-key={"meta1"} data-init-value={initMetaData["meta1"]} placeholder={initMetaData["meta1"] || "meta 1"} onChange={props.handleMetadata.bind(this)()} onClick={props.handleInitMetadata.bind(this)()} onBlur={props.handleInitMetadata.bind(this)()} />
+                <input type="text" data-uid={fileItem.uid} data-meta-key={"meta2"} data-init-value={initMetaData["meta2"]} placeholder={initMetaData["meta2"] || "meta 2"} onChange={props.handleMetadata.bind(this)()} onClick={props.handleInitMetadata.bind(this)()} onBlur={props.handleInitMetadata.bind(this)()} />
+                <button className={styles.deleteBtn} onClick={() => props.removeHandler(fileItem)}>
+                  x
+                </button>
+              </div>
+            );
+          })}
+          <DataTransferArea />
+        </>
+      ) : (
+        <DataTransferArea />
+      )}
     </div>
   );
 };
@@ -311,33 +333,35 @@ export class FileGrid extends React.Component {
     const { i18n } = this.props;
     return (
       <div className={"wrapper"}>
-        {this.state.loading ? <div className={styles.loading}>Loading</div> : null}
+        {this.state.loading && <Loading {...this.props} />}
         <div className={styles.wrapper}>
-          {this.state.files.length > 0 && this.state.files.map((media, index) => <Media i18n={i18n} key={index} data={media} removeHandler={this.removeFile} isAuthenticated={this.props.isAuthenticated} />)}
-          {this.state.files.length === 0 && (
+          {this.state.files.length > 0 ? (
             <>
-              <hr />
-              {i18n._("no_images_available")}
-              <hr />
+              <div className={styles.header}>
+                {this.props.i18n._("uploaded_files")} ({this.state.files.length})
+              </div>
+              {this.state.files.map((media, index) => (
+                <Media i18n={i18n} key={index} data={media} removeHandler={this.removeFile} isAuthenticated={this.props.isAuthenticated} />
+              ))}
             </>
+          ) : (
+            <div className={styles.header}>{this.props.i18n._("no_images_available")}</div>
           )}
         </div>
         {this.props.isAuthenticated && (
           <>
             {this.state.previewFiles && this.state.previewFiles.length > 0 && (this.state.uploadProgress || this.state.uploadProgress > 0) && `${this.state.uploadProgress}%`}
             <hr />
-            {this.state.previewFiles && this.state.previewFiles.length > 0 && (
-              <PreviewFiles
-                //
-                i18n={i18n}
-                listedFiles={this.state.files}
-                files={this.state.previewFiles}
-                removeHandler={this.removePreviewFile}
-                metaData={this.state.filesMetaData}
-                handleInitMetadata={() => this.handleInitMetadata.bind(this)}
-                handleMetadata={() => this.handleMetadata.bind(this)}
-              />
-            )}
+            <PreviewFiles
+              //
+              i18n={i18n}
+              listedFiles={this.state.files}
+              files={this.state.previewFiles}
+              removeHandler={this.removePreviewFile}
+              metaData={this.state.filesMetaData}
+              handleInitMetadata={() => this.handleInitMetadata.bind(this)}
+              handleMetadata={() => this.handleMetadata.bind(this)}
+            />
             <form className={styles.form} action={this.baseUrl + "/upload"} ref={ref => (this.formRef = ref)} method="post" encType="multipart/form-data" onSubmit={this.handleSubmit}>
               <input type="file" name="imageFile" multiple={true} key={this.state.refreshToken || ""} ref={ref => (this.filesToUpload = this.filesInputRef = ref)} onChange={this.previewFilesHandler} />
               <input type="hidden" name="path" value={this.baseDir} />
